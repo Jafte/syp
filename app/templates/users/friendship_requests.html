@@ -1,0 +1,31 @@
+{% extends "users/profile.html" %}
+
+{% block title %}Заявки в друзья{% endblock %}
+
+{% block friendship_content %}{% endblock %}
+
+{% block user_profile_content %}
+    <h1>Заявки в друзья</h1>
+    <table class="table">
+        <tr>
+            <th>Отправитель</th>
+            <th>Комментарий</th>
+            <th></th>
+        </tr>
+        {% for friendship_request in friendship_requests %}
+        <tr>
+            <td>
+                <a href="{% url "user_profile" user_uuid=friendship_request.sender.pk %}">
+                    {{ friendship_request.sender.full_name }}
+                </a>
+            </td>
+            <td>
+                {{ friendship_request.comment }}
+            </td>
+            <td>
+                <a href="{% url "friendship_request" request_id=friendship_request.pk %}">реквест</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

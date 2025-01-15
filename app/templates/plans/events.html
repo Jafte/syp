@@ -1,0 +1,41 @@
+{% extends "users/profile.html" %}
+
+{% block title %}Мои планы{% endblock %}
+
+{% block user_profile_content %}
+    <h1>Мои планы</h1>
+    <a href="{% url "add_event" %}" class="btn btn-primary">Добавить событие</a>
+    <table class="table">
+        <tr>
+            <th>Название</th>
+            <th>Дата</th>
+            <th>Место</th>
+            <th>Участников</th>
+            <th>Активных заявок</th>
+        </tr>
+        {% for event in events %}
+        <tr>
+            <td>
+                <h5>
+                    <a href="{% url "event_detail" event_id=event.pk %}">{{ event.title }}</a>
+                </h5>
+                <p>
+                    {{ event.description }}
+                </p>
+            </td>
+            <td>
+                {{ event.started_at }} - {{ event.ended_at }}
+            </td>
+            <td>
+                {{ event.location }}
+            </td>
+            <td>
+                {{ event.attendees.count }}
+            </td>
+            <td>
+                {{ event.action_required_requests.count }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "users/profile.html" %}
+
+{% block title %}Заявка в друзья{% endblock %}
+
+{% block friendship_content %}{% endblock %}
+
+{% block user_profile_content %}
+    <h1>Заявка в друзья</h1>
+    <p>Вы собираетесь принять заявку в друзья от этого пользователя. После этого данный пользователь сможет увидеть ваш профиль и публичную информацию о вас</p>
+    <p>
+        <a href="{% url "user_profile" user_uuid=friendship_request.sender.pk %}">
+            {{ friendship_request.sender.full_name }}
+        </a>
+    </p>
+    <p>
+        {{ friendship_request.comment }}
+    </p>
+    {% if friendship_request.is_pending %}
+        <form action="{% url 'friendship_request' request_id=friendship_request.pk %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {{ form.action.errors }}
+            <button type="submit" name="action" value="accept" class="btn btn-primary">Принять заявку</button>
+            <button type="submit" name="action" value="reject" class="btn btn-secondary">Отклонить заявку</button>
+            <a href="{% url "friendship_requests" %}" class="btn btn-secondary">Назад</a>
+        </form>
+    {% else %}
+        <p>Заявка уже обработана</p>
+    {% endif %}
+{% endblock %}

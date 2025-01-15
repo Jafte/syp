@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Планы друзей{% endblock %}
+
+{% block content %}
+    <h1>Планы друзей</h1>
+    <table class="table">
+        <tr>
+            <th>Название</th>
+            <th>Организатор</th>
+            <th>Дата</th>
+            <th>Место</th>
+            <th>Участников</th>
+        </tr>
+        {% for event in events %}
+        <tr>
+            <td>
+                <h5>
+                    <a href="{% url "event_detail" event_id=event.pk %}">{{ event.title }}</a>
+                </h5>
+                <p>
+                    {{ event.description }}
+                </p>
+            </td>
+            <td>
+                {{ event.created_by.first_name }} {{ event.created_by.last_name }}
+            </td>
+            <td>
+                {{ event.started_at }} - {{ event.ended_at }}
+            </td>
+            <td>
+                {{ event.location }}
+            </td>
+            <td>
+                {{ event.attendees.count }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ event.title }}</h1>
+    <p>{{ event.description }}</p>
+    <p>{{ event.started_at }} - {{ event.ended_at }}</p>
+    <p>{{ event.location }}</p>
+
+    {% if event.creator != user %}
+    <p>{{ event.creator.first_name }} {{ event.creator.last_name }}</p>
+    {% endif %}
+
+    <p>Участники</p>
+    <ul>
+    {% for attendee in event.attendees.all %}
+        <li>
+            <a href="{% url "profile" user_uuid=attendee.pk %}">#{{ attendee.pk }} {{ attendee.first_name }} {{ attendee.last_name }}</a>
+        </li>
+    {% empty %}
+        <li>Нет участников</li>
+    {% endfor %}
+    </ul>
+
+    {% if event.creator == user %}
+        <p>Заявки на участие</p>
+        <ul>
+            {% for request in event.action_required_requests.all %}
+            <li>
+                <p>от #{{ request.sender.pk }} {{ request.sender.first_name }} {{ request.sender.last_name }}</p>
+                <p>{{ request.comment }}</p>
+                <form action="{% url 'event_attendee_request_action' event_id=event.pk request_id=request.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="accept" class="btn btn-primary">Принять</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">Отклонить</button>
+                </form>
+            </li>
+            {% empty %}
+            <li>Нет заявок</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Заявка на участие</p>
+        {% if can_send_attendee_requests %}
+            <form>
+                <a href="{% url "event_attendee_request_create" event_id=event.pk %}" class="btn btn-primary">Отправить заявку</a>
+            </form>
+        {% else %}
+            {% if accepted_attendee_requests %}
+                <p>Ваша заявка на участие принята</p>
+            {% else %}
+                <p>Ваша заявка на участие отправлена</p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    {% if event.creator == user %}
+        <a href="{% url "my_plans" %}" class="btn btn-secondary">Назад к списку моих планов</a>
+    {% else %}
+        <a href="{% url "friends_plans" %}" class="btn btn-secondary">Назад к списку планов друзей</a>
+    {% endif %}
+{% endblock %}
