@@ -28,6 +28,7 @@ SECRET_KEY = env('SECRET_KEY', str, 'django-insecure-forcivcl$lqfll9=!u#vcgvutw7
 DEBUG = env('DEBUG', bool, True)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', list, ['127.0.0.1', 'localhost'])
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS', list, [])
 
 
 # Application definition
@@ -152,4 +153,4 @@ REST_KNOX = {
   'AUTH_HEADER_PREFIX': 'Token',
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS', list, ['http://127.0.0.1:8000', 'http://localhost:8000'])
