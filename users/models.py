@@ -37,11 +37,13 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
+    telegram_id = models.BigIntegerField(null=True, blank=True, db_index=True)
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_email_faked = models.BooleanField(default=False)
     friends = models.ManyToManyField("self", through="Friendship", symmetrical=False)
 
     objects = MyUserManager()

@@ -1,3 +1,10 @@
+import hmac
+import hashlib
+import json
+from urllib import parse
+from urllib.parse import unquote, urlparse
+
+from django.conf import settings
 from django.contrib.auth import login
 
 from rest_framework import permissions, status
@@ -10,6 +17,56 @@ from users.models import User, FriendshipRequest
 from users.serializers import DetailUserSerializer, UserSerializer, FriendshipRequestSerializer
 
 from knox.views import LoginView as KnoxLoginView
+
+
+class TelegramLoginView(KnoxLoginView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        tg_data = parse.parse_qs(request.data)
+
+        if self.validate(tg_data.get('hash')[0], request.data, settings.TELEGRAM_BOT_TOKEN):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        user_data = json.loads(tg_data['user'][0])
+        telegram_id = user_data['id']
+        try:
+            user = User.objects.get(telegram_id=telegram_id)
+        except User.DoesNotExist:
+            user = User.objects.create_user(
+                email=f'{user_data['id']}@telegram.org',
+                is_email_faked=True,
+                telegram_id=user_data['id'],
+                first_name=user_data['first_name'],
+                last_name=user_data['last_name'],
+            )
+        login(request, user)
+        return super(LoginView, self).post(request, format=format)
+
+    def validate(hash_str, init_data, token, c_str="WebAppData"):
+        """
+        Validates the data received from the Telegram web app, using the
+        method documented here:
+        https://core.telegram.org/bots/webapps#validating-data-received-via-the-web-app
+
+        hash_str - the has string passed by the webapp
+        init_data - the query string passed by the webapp
+        token - Telegram bot's token
+        c_str - constant string (default = "WebAppData")
+        """
+
+        init_data = sorted([chunk.split("=")
+                            for chunk in unquote(init_data).split("&")
+                            if chunk[:len("hash=")] != "hash="],
+                           key=lambda x: x[0])
+        init_data = "\n".join([f"{rec[0]}={rec[1]}" for rec in init_data])
+
+        secret_key = hmac.new(c_str.encode(), token.encode(),
+                              hashlib.sha256).digest()
+        data_check = hmac.new(secret_key, init_data.encode(),
+                              hashlib.sha256)
+
+        return data_check.hexdigest() == hash_str
 
 
 class LoginView(KnoxLoginView):

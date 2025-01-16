@@ -21,11 +21,12 @@ from django.views.generic import TemplateView
 from knox import views as knox_views
 
 from plans.views import UserEventsListView, AddUserEventView
-from users.views import LoginView, UserView, AuthUserView, UserFriendsView, UserFriendRequestsView
+from users.views import LoginView, UserView, AuthUserView, UserFriendsView, UserFriendRequestsView, TelegramLoginView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/auth/telegram/', TelegramLoginView.as_view(), name='telegram_login'),
     path('api/auth/login/', LoginView.as_view(), name='knox_login'),
     path('api/auth/logout/', knox_views.LogoutView.as_view(), name='knox_logout'),
     path('api/auth/logoutall/', knox_views.LogoutAllView.as_view(), name='knox_logoutall'),

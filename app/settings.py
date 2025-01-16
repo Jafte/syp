@@ -153,4 +153,6 @@ REST_KNOX = {
   'AUTH_HEADER_PREFIX': 'Token',
 }
 
-CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS', list, ['http://127.0.0.1:8000', 'http://localhost:8000'])
+CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS', list, ['http://127.0.0.1:8000', 'http://localhost:4200'])
+
+TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN', str, '')
