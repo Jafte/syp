@@ -23,9 +23,17 @@ class TelegramLoginView(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        tg_data = parse.parse_qs(request.data)
+        if request.user.is_authenticated:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        if self.validate(tg_data.get('hash')[0], request.data, settings.TELEGRAM_BOT_TOKEN):
+        tg_data = parse.parse_qs(request.data.get('user_data'))
+
+        try:
+            hash_str = tg_data['hash'][0]
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if not self.validate(hash_str, request.data.get('user_data'), settings.TELEGRAM_BOT_TOKEN):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         user_data = json.loads(tg_data['user'][0])
@@ -33,7 +41,7 @@ class TelegramLoginView(KnoxLoginView):
         try:
             user = User.objects.get(telegram_id=telegram_id)
         except User.DoesNotExist:
-            user = User.objects.create_user(
+            user = User.objects.create(
                 email=f'{user_data['id']}@telegram.org',
                 is_email_faked=True,
                 telegram_id=user_data['id'],
@@ -41,9 +49,9 @@ class TelegramLoginView(KnoxLoginView):
                 last_name=user_data['last_name'],
             )
         login(request, user)
-        return super(LoginView, self).post(request, format=format)
+        return super(TelegramLoginView, self).post(request, format=format)
 
-    def validate(hash_str, init_data, token, c_str="WebAppData"):
+    def validate(self, hash_str, init_data, token, c_str="WebAppData"):
         """
         Validates the data received from the Telegram web app, using the
         method documented here:
@@ -73,6 +81,9 @@ class LoginView(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
+        if request.user.is_authenticated:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
