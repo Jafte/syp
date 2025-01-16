@@ -4,10 +4,6 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 # Install the project into `/app`
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y python3-dev \
-  default-libmysqlclient-dev build-essential pkg-config \
-	--no-install-recommends && rm -rf /var/lib/apt/lists/*
-
 # Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1
 
