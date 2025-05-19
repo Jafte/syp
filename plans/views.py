@@ -22,7 +22,6 @@ class UserEventsListView(ListAPIView):
 class AddUserEventView(CreateAPIView):
     serializer_class = EventSerializer
 
-
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
 

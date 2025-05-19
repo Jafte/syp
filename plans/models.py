@@ -9,7 +9,9 @@ class Event(models.Model):
     description = models.TextField(blank=True)
     started_at = models.DateTimeField(null=True, blank=True)
     ended_at = models.DateTimeField(null=True, blank=True)
-    location = models.CharField(max_length=200, blank=True)
+    location_text = models.CharField(max_length=200, blank=True)
+    location_long = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    location_lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def action_required_requests(self):

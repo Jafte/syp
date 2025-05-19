@@ -16,6 +16,6 @@ class EventAttendeeRequestInline(admin.TabularInline):
 
 @admin.register(Event)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ('creator', 'title', 'started_at', 'ended_at', 'location')
+    list_display = ('creator', 'title', 'started_at', 'ended_at', 'location_text', 'location_lat', 'location_long')
     raw_id_fields = ('creator',)
     inlines = [EventAttendeeInline, EventAttendeeRequestInline]
